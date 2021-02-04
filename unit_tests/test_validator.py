@@ -1,5 +1,6 @@
 import pytest
 
+from competition import Competition
 from validator import Validator
 
 
@@ -7,10 +8,8 @@ class TestValidator():
     @pytest.fixture
     def validator(self):
         num_pizzas = 30
-        teams_of_2 = 1
-        teams_of_3 = 2
-        teams_of_4 = 1
-        validator = Validator(teams_of_2, teams_of_3, teams_of_4, num_pizzas)
+        competition = Competition(1, 2, 1)
+        validator = Validator(competition, num_pizzas)
         yield validator
 
     def test_valid_solutions(self, validator):

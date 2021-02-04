@@ -1,12 +1,14 @@
 from typing import List
 
+from competition import Competition
+
 
 class Validator:
-    def __init__(self, teams_of_2: int, teams_of_3: int, teams_of_4: int, num_pizzas: int):
-        self.teams_of_2 = teams_of_2
-        self.teams_of_3 = teams_of_3
-        self.teams_of_4 = teams_of_4
-        self.num_teams = teams_of_2 + teams_of_3 + teams_of_4
+    def __init__(self, competition: Competition, num_pizzas: int):
+        self.teams_of_2 = competition.teams_of_two
+        self.teams_of_3 = competition.teams_of_three
+        self.teams_of_4 = competition.teams_of_four
+        self.num_teams = competition.total_teams
         self.num_pizzas = num_pizzas
 
     def validate(self, entries: List[List[int]]) -> bool:
