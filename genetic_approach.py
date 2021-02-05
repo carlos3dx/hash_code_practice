@@ -3,13 +3,17 @@ import json
 import sys
 
 from components.data_import import read_file
+from components.population_generator import generate_pop
 
 parser = argparse.ArgumentParser(description='Tries using a genetic algorithm to solve the problem')
 
-parser.add_argument('-f', '--file', metavar='INPUT_FILE', type=str,
+parser.add_argument('-i', '--file', metavar='INPUT_FILE', type=str,
                     help='The file provided with the challenge as an input')
-parser.add_argument('-i', '--initial', metavar='POPULATION_FILE', type=str,
+parser.add_argument('-f', '--initial', metavar='POPULATION_FILE', type=str,
                     help='The file with the initial population. Result of previous executions can be used.')
+parser.add_argument('-x', '--initial_pop', type=int,
+                    help='If not specified the file with the initial population, '
+                         'set the number of individuals to generate', default=10)
 parser.add_argument('-m', '--max_iterations', type=int, help='Number of iterations the program can be running',
                     default=1000)
 parser.add_argument('-n', '--no_improve_stop', type=int,
@@ -32,7 +36,20 @@ if __name__ == '__main__':
     pizzeria, competition = read_file(args.file)
 
     if args.initial:
+        print('Loading file with initial population')
         with open(args.initial, 'r') as file:
             population = json.load(file).get('population')
     else:
+        print('Generating random population')
+        population = generate_pop(args.initial_pop, competition, pizzeria)
+
+    print('-'*20)
+    for i in range(args.max_iterations):
+        print(f'Iteration {i} of {args.max_iterations}')
+        #make pairs
+            #shuffle and divide
+        #breed
+        #calcule score and order according
+        #if score not increased in n iterations, break
+        #remove indivuduals with poor score
 
