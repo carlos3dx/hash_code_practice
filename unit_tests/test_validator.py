@@ -1,7 +1,7 @@
 import pytest
 
-from competition import Competition
-from validator import Validator
+from components.competition import Competition
+from components.validator import Validator
 
 
 class TestValidator():

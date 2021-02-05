@@ -1,6 +1,6 @@
 from typing import List
 
-from competition import Competition
+from components.competition import Competition
 
 
 class Validator:

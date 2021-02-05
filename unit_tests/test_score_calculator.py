@@ -1,6 +1,6 @@
 import pytest
 
-from score_calculator import ScoreCalculator
+from components.score_calculator import ScoreCalculator
 
 
 class TestScoreCalculator():

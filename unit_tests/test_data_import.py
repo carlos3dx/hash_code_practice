@@ -1,8 +1,8 @@
 import os
 
-from competition import Competition
-from data_import import read_file
-from pizzeria import Pizzeria
+from components.competition import Competition
+from components.data_import import read_file
+from components.pizzeria import Pizzeria
 
 test_files_path = os.path.abspath(os.path.dirname(__file__))
 

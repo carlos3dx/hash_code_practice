@@ -1,5 +1,5 @@
-from competition import Competition
-from pizzeria import Pizzeria
+from components.competition import Competition
+from components.pizzeria import Pizzeria
 
 
 class TestObjects:

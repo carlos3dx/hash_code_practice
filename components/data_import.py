@@ -1,7 +1,7 @@
 from typing import Tuple
 
-from competition import Competition
-from pizzeria import Pizzeria
+from components.competition import Competition
+from components.pizzeria import Pizzeria
 
 
 def read_file(file_path: str) -> Tuple[Pizzeria, Competition]:
