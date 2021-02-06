@@ -1,9 +1,15 @@
 import argparse
 import json
 import sys
+from random import shuffle
 
+from math import floor
+
+from components.breeder import Breeder
 from components.data_import import read_file
 from components.population_generator import generate_pop
+from components.score_calculator import ScoreCalculator
+from components.validator import Validator
 
 parser = argparse.ArgumentParser(description='Tries using a genetic algorithm to solve the problem')
 
@@ -43,13 +49,50 @@ if __name__ == '__main__':
         print('Generating random population')
         population = generate_pop(args.initial_pop, competition, pizzeria)
 
-    print('-'*20)
+    score_calculator = ScoreCalculator(pizzeria.pizzas)
+    print('Calculate initial score')
+
+    population.sort(key=score_calculator.calculate, reverse=True)
+
+    best_score = score_calculator.calculate(population[0])
+
+    print(f'Initial best score is {best_score} poins')
+    iterations_without_improvement = 0
+
+    validator = Validator(competition, len(pizzeria.pizzas))
+    breeder = Breeder(list(pizzeria.pizzas.keys()), validator, args.evolution)
+
+    print('-' * 30)
     for i in range(args.max_iterations):
         print(f'Iteration {i} of {args.max_iterations}')
-        #make pairs
-            #shuffle and divide
-        #breed
-        #calcule score and order according
-        #if score not increased in n iterations, break
-        #remove indivuduals with poor score
-
+        # make pairs
+        shuffle(population)
+        new_pop = []
+        num_pairs = floor(len(population) / 2)
+        for i in range(num_pairs):
+            parent_a = population[i * 2]
+            parent_b = population[1 + i * 2]
+            new_pop.append(parent_a)
+            new_pop.append(parent_b)
+            children = breeder.breed(parent_a, parent_b)
+            new_pop.extend(children)
+        population = new_pop
+        # breed
+        # calcule score and order according
+        population.sort(key=score_calculator.calculate, reverse=True)
+        new_best_score = score_calculator.calculate(population[0])
+        print(f'Current best score is {new_best_score} points')
+        print(population[0])
+        # if score not increased in n iterations, break
+        if new_best_score > best_score:
+            iterations_without_improvement = 0
+            best_score = new_best_score
+        else:
+            iterations_without_improvement += 1
+            print(f'{iterations_without_improvement} iterations without an improvement')
+            if args.no_improve_stop and iterations_without_improvement == args.no_improve_stop:
+                print(f'Finishing early cause no improvement after {args.no_improve_stop} iterations')
+                break
+        # remove individuals with poor score
+        if len(population) > args.max_pop:
+            population = population[:args.max_pop]
