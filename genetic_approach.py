@@ -1,4 +1,5 @@
 import argparse
+import copy
 import json
 import sys
 from random import shuffle
@@ -76,7 +77,7 @@ if __name__ == '__main__':
             new_pop.append(parent_b)
             children = breeder.breed(parent_a, parent_b)
             new_pop.extend(children)
-        population = new_pop
+        population = copy.deepcopy(new_pop)
         # breed
         # calcule score and order according
         population.sort(key=score_calculator.calculate, reverse=True)
