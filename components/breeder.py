@@ -47,26 +47,35 @@ class Breeder:
                     for order in child:
                         new_order = [order[0]]
                         for i in range(len(order) - 1):
-                            if order[i + 1] in duplicates and len(available_pizzas):
-                                duplicates.remove(order[i + 1])
-                                new_order.append(available_pizzas.pop())
+                            if order[i + 1] in duplicates:
+                                if len(available_pizzas):
+                                    duplicates.remove(order[i + 1])
+                                    new_order.append(available_pizzas.pop())
+                                else:
+                                    if len(new_order) >= 2:
+                                        for x in new_order[1:]:
+                                            available_pizzas.append(x)
+                                        for x in order[1:]:
+                                            if x in duplicates:
+                                                duplicates.remove(x)
+                                    new_order = None
+                                    break
                             else:
                                 new_order.append(order[i + 1])
-                        new_child.append(new_order)
+                        if new_order:
+                            new_child.append(new_order)
                     if not duplicates or not available_pizzas:
                         break
             else:
-                order_to_remove = None
                 for order in child:
+                    order_to_remove = None
                     for i in range(len(order) - 1):
                         if order[i + 1] in duplicates:
+                            duplicates.remove(order[i + 1])
                             order_to_remove = order
-                            break
-                    if order_to_remove:
-                        break
-                    else:
+                    if order_to_remove is None:
                         new_child.append(order)
-                new_child = self.validator.validate(new_child)
+                new_child = self.verify_and_correct(new_child)
         else:
             new_child = child
         return new_child

@@ -40,3 +40,12 @@ class TestValidator():
         assert not validator.validate(solution_d)
         assert not validator.validate(solution_e)
         assert not validator.validate(solution_f)
+
+    def test_invalid_solution_with_different_competition(self):
+        num_pizzas = 5
+        competition = Competition(2, 2, 0)
+        validator = Validator(competition, num_pizzas)
+
+        solution_a = [[2, 2, 4], [2, 1, 3], [2, 0, 3]]
+
+        assert not validator.validate(solution_a)

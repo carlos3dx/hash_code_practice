@@ -77,6 +77,8 @@ if __name__ == '__main__':
             new_pop.append(parent_b)
             children = breeder.breed(parent_a, parent_b)
             new_pop.extend(children)
+        if len(population) % 2:
+            new_pop.extend(population[num_pairs*2:])
         population = copy.deepcopy(new_pop)
         # breed
         # calcule score and order according
@@ -97,3 +99,5 @@ if __name__ == '__main__':
         # remove individuals with poor score
         if len(population) > args.max_pop:
             population = population[:args.max_pop]
+    score = score_calculator.calculate(population[0])
+    print(f'Best solution with score of {score} points is: {population[0]}')
