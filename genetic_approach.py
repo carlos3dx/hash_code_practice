@@ -8,6 +8,7 @@ from math import floor
 
 from components.breeder import Breeder
 from components.data_import import read_file
+from components.export_result import write_result
 from components.population_generator import generate_pop
 from components.score_calculator import ScoreCalculator
 from components.validator import Validator
@@ -101,3 +102,8 @@ if __name__ == '__main__':
             population = population[:args.max_pop]
     score = score_calculator.calculate(population[0])
     print(f'Best solution with score of {score} points is: {population[0]}')
+
+    with open(args.population, 'w') as outfile:
+        json.dump({"population": population}, outfile)
+
+    write_result(args.result, population[0])
