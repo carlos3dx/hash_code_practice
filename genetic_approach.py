@@ -58,7 +58,7 @@ if __name__ == '__main__':
 
     best_score = score_calculator.calculate(population[0])
 
-    print(f'Initial best score is {best_score} poins')
+    print(f'Initial best score is {best_score} poitns')
     iterations_without_improvement = 0
 
     validator = Validator(competition, len(pizzeria.pizzas))
@@ -86,7 +86,7 @@ if __name__ == '__main__':
         population.sort(key=score_calculator.calculate, reverse=True)
         new_best_score = score_calculator.calculate(population[0])
         print(f'Current best score is {new_best_score} points')
-        print(population[0])
+        # print(population[0])
         # if score not increased in n iterations, break
         if new_best_score > best_score:
             iterations_without_improvement = 0
