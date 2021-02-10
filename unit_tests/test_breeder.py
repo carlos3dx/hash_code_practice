@@ -99,3 +99,45 @@ class TestBreeder:
         assert len(result) == 4
         for expected_child in expected_childs:
             assert expected_child in result
+
+    def test_mutate_with_available_pizzas(self):
+        num_pizzas = 5
+        pizzas = list(range(num_pizzas))
+        input_result = [[2, 0, 1], [2, 2, 3]]
+
+        possible_valid_outcomes = [
+            [[2, 0, 1], [2, 2, 4]],
+            [[2, 0, 1], [2, 4, 3]],
+            [[2, 0, 4], [2, 2, 3]],
+            [[2, 4, 1], [2, 2, 3]]
+        ]
+
+        competition = Competition(2, 0, 0)
+        validator = Validator(competition, num_pizzas)
+
+        breeder = Breeder(pizzas, validator, 100)
+
+        result = breeder.mutate(input_result)
+
+        assert result in possible_valid_outcomes
+
+    def test_mutate_without_available_pizzas(self):
+        num_pizzas = 4
+        pizzas = list(range(num_pizzas))
+        input_result = [[2, 0, 1], [2, 2, 3]]
+
+        possible_valid_outcomes = [
+            [[2, 0, 3], [2, 2, 1]],
+            [[2, 0, 2], [2, 1, 3]],
+            [[2, 3, 1], [2, 2, 0]],
+            [[2, 2, 1], [2, 0, 3]]
+        ]
+
+        competition = Competition(2, 0, 0)
+        validator = Validator(competition, num_pizzas)
+
+        breeder = Breeder(pizzas, validator, 100)
+
+        result = breeder.mutate(input_result)
+
+        assert result in possible_valid_outcomes
