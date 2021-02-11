@@ -2,13 +2,15 @@ from copy import deepcopy
 from random import sample, choices, randint
 from typing import List
 
+from components.competition import Competition
 from components.validator import Validator
 
 
 class Breeder:
-    def __init__(self, pizzas: List[int], validator: Validator, mutation_factor: int) -> None:
+    def __init__(self, pizzas: List[int], validator: Validator, competition: Competition, mutation_factor: int) -> None:
         self.pizzas_indexes = pizzas
         self.validator = validator
+        self.competition = competition
         self.mutation_factor = mutation_factor
 
     def breed(self, parent_a: List[List[int]], parent_b: List[List[int]]) -> List[List[List[int]]]:
@@ -66,6 +68,7 @@ class Breeder:
                             new_child.append(new_order)
                     if not duplicates or not available_pizzas:
                         break
+                new_child = self.verify_and_correct(new_child)
             else:
                 for order in child:
                     order_to_remove = None

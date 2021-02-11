@@ -19,7 +19,14 @@ class Validator:
                      all(self.validate_entry(entry) for entry in entries)
             if result:
                 pizza_ids = [pizza_id for entry in entries for pizza_id in entry[1:]]
-                result = result and len(pizza_ids) == len(set(pizza_ids))
+                teams_served = [entry[0] for entry in entries]
+                t2 = teams_served.count(2)
+                t3 = teams_served.count(3)
+                t4 = teams_served.count(4)
+                result = result and len(pizza_ids) == len(set(pizza_ids)) \
+                         and self.teams_of_2 >= t2 \
+                         and self.teams_of_3 >= t3 \
+                         and self.teams_of_4 >= t4
         return result
 
     def validate_entry(self, entry: List[int]) -> bool:

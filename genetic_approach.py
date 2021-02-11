@@ -62,7 +62,7 @@ if __name__ == '__main__':
     iterations_without_improvement = 0
 
     validator = Validator(competition, len(pizzeria.pizzas))
-    breeder = Breeder(list(pizzeria.pizzas.keys()), validator, args.evolution)
+    breeder = Breeder(list(pizzeria.pizzas.keys()), validator, competition, args.evolution)
 
     print('-' * 30)
     for i in range(args.max_iterations):
@@ -101,7 +101,7 @@ if __name__ == '__main__':
         if len(population) > args.max_pop:
             population = population[:args.max_pop]
     score = score_calculator.calculate(population[0])
-    print(f'Best solution with score of {score} points is: {population[0]}')
+    print(f'Best solution has a score of {score} points')
 
     with open(args.population, 'w') as outfile:
         json.dump({"population": population}, outfile)

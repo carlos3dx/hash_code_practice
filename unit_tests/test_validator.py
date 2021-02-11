@@ -33,6 +33,7 @@ class TestValidator():
         solution_d = [[2, 10, 500]]  # invalid pizza id
         solution_e = [[2, 1, 2], [2, 0, 1]]  # duplicated pizza id across two teams
         solution_f = [[2, 1, 1], [2, 0, 2]]  # duplicated pizza id in same team
+        solution_g = [[2, 0, 1], [2, 2, 3]]  # more two teams than availabre
 
         assert not validator.validate(solution_a)
         assert not validator.validate(solution_b)
@@ -40,6 +41,7 @@ class TestValidator():
         assert not validator.validate(solution_d)
         assert not validator.validate(solution_e)
         assert not validator.validate(solution_f)
+        assert not validator.validate(solution_g)
 
     def test_invalid_solution_with_different_competition(self):
         num_pizzas = 5
