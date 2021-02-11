@@ -100,6 +100,54 @@ class TestBreeder:
         for expected_child in expected_childs:
             assert expected_child in result
 
+    def test_breed_when_conflict_due_teams_inevitable_and_extra_pizzas_available(self):
+        num_pizzas = 10
+        pizzas = list(range(num_pizzas))
+        parent_a = [[2, 2, 4], [3, 0, 1, 3]]
+        parent_b = [[3, 4, 1, 2], [2, 0, 3]]
+
+        expected_childs = [
+            [[3, 2, 4, 1], [2, 0, 3]],
+            [[2, 4, 9], [3, 0, 1, 3]],
+            [[3, 0, 3, 1], [2, 2, 4]],
+            [[2, 0, 9], [3, 4, 1, 2]]
+        ]
+
+        competition = Competition(1, 1, 0)
+        validator = Validator(competition, num_pizzas)
+
+        breeder = Breeder(pizzas, validator, competition, 0)
+
+        result = breeder.breed(parent_a, parent_b)
+
+        assert len(result) == 4
+        for expected_child in expected_childs:
+            assert expected_child in result
+
+    def test_breed_when_conflict_due_teams_inevitable_and_no_extra_pizzas_available(self):
+        num_pizzas = 5
+        pizzas = list(range(num_pizzas))
+        parent_a = [[2, 2, 4], [3, 0, 1, 3]]
+        parent_b = [[3, 4, 1, 2], [2, 0, 3]]
+
+        expected_childs = [
+            [[3, 2, 4, 1], [2, 0, 3]],
+            [[3, 0, 1, 3]],
+            [[3, 0, 3, 1], [2, 2, 4]],
+            [[3, 4, 1, 2]]
+        ]
+
+        competition = Competition(1, 1, 0)
+        validator = Validator(competition, num_pizzas)
+
+        breeder = Breeder(pizzas, validator, competition, 0)
+
+        result = breeder.breed(parent_a, parent_b)
+
+        assert len(result) == 4
+        for expected_child in expected_childs:
+            assert expected_child in result
+
     def test_mutate_with_available_pizzas(self):
         num_pizzas = 5
         pizzas = list(range(num_pizzas))

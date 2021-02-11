@@ -35,53 +35,132 @@ class Breeder:
 
         return [self.mutate(x) for x in result]
 
-    # TODO refactor
-    def verify_and_correct(self, child):
-        new_child = []
-        if not self.validator.validate(child):
-            used_pizzas = [pizza for order in child for pizza in order[1:]]
+    def verify_and_correct(self, child: List[List[int]]) -> List[List[int]]:
+        result = deepcopy(child)
+        while not self.validator.validate(result):
+            used_pizzas = [pizza for order in result for pizza in order[1:]]
             available_pizzas = [pizza for pizza in self.pizzas_indexes if pizza not in used_pizzas]
             duplicates = deepcopy(used_pizzas)
             for x in list(set(used_pizzas)):
                 duplicates.remove(x)
-            if available_pizzas:
-                while True:
-                    for order in child:
-                        new_order = [order[0]]
-                        for i in range(len(order) - 1):
-                            if order[i + 1] in duplicates:
-                                if len(available_pizzas):
-                                    duplicates.remove(order[i + 1])
-                                    new_order.append(available_pizzas.pop())
-                                else:
-                                    if len(new_order) >= 2:
-                                        for x in new_order[1:]:
-                                            available_pizzas.append(x)
-                                        for x in order[1:]:
-                                            if x in duplicates:
-                                                duplicates.remove(x)
-                                    new_order = None
-                                    break
-                            else:
-                                new_order.append(order[i + 1])
-                        if new_order:
-                            new_child.append(new_order)
-                    if not duplicates or not available_pizzas:
-                        break
-                new_child = self.verify_and_correct(new_child)
+            if duplicates:
+                result = self.correct_duplicates(available_pizzas, duplicates, result)
             else:
-                for order in child:
-                    order_to_remove = None
-                    for i in range(len(order) - 1):
-                        if order[i + 1] in duplicates:
-                            duplicates.remove(order[i + 1])
-                            order_to_remove = order
-                    if order_to_remove is None:
-                        new_child.append(order)
-                new_child = self.verify_and_correct(new_child)
+                if len(result) > self.competition.total_teams:
+                    result = self.remove_extra_order(result, choices([2, 3, 4], k=1)[0])
+                else:
+                    result = self.correct_exceeded_teams(available_pizzas, result)
+        return result
+
+    def correct_duplicates(self, available_pizzas: List[int], duplicates: List[int],
+                           child: List[List[int]]) -> List[List[int]]:
+        if available_pizzas:
+            result = self.correct_duplicates_with_available_pizzas(available_pizzas, duplicates, child)
         else:
-            new_child = child
+            result = self.correct_duplicates_without_available_pizzas(duplicates, child)
+        return result
+
+    def correct_duplicates_with_available_pizzas(self, available_pizzas: List[int], duplicates: List[int],
+                                                 child: List[List[int]]) -> List[List[int]]:
+        new_child = []
+        for order in child:
+            if any(map(lambda x: x in duplicates, order[1:])):
+                new_order = [order[0]]
+                for pizza in order[1:]:
+                    if pizza in duplicates and available_pizzas:
+                        duplicates.remove(pizza)
+                        new_order.append(available_pizzas.pop())
+                    else:
+                        new_order.append(pizza)
+                new_child.append(new_order)
+            else:
+                new_child.append(order)
         return new_child
+
+    def correct_duplicates_without_available_pizzas(self, duplicates: List[int], child: List[List[int]]) -> List[
+        List[int]]:
+        new_child = []
+        for order in child:
+            order_to_remove = None
+            for i in range(len(order) - 1):
+                if order[i + 1] in duplicates:
+                    duplicates.remove(order[i + 1])
+                    order_to_remove = order
+            if order_to_remove is None:
+                new_child.append(order)
+        return new_child
+
+    # TODO refactor to remove complexity
+    def correct_exceeded_teams(self, available_pizzas: List[int], child: List[List[int]]) -> List[List[int]]:
+        used_teams = [order[0] for order in child]
+        a_t2 = self.competition.teams_of_two - used_teams.count(2)
+        a_t3 = self.competition.teams_of_three - used_teams.count(3)
+        a_t4 = self.competition.teams_of_four - used_teams.count(4)
+
+        if a_t2 < 0 and a_t3 < 0 and a_t4 < 0:
+            result = self.remove_extra_order(child, 2)
+        elif a_t3 < 0 and a_t4 < 0:
+            if a_t2:
+                result = self.downsize_team(child, 3, 2)
+            else:
+                result = self.remove_extra_order(child, 3)
+        elif a_t4 < 0:
+            if a_t3:
+                result = self.downsize_team(child, 4, 3)
+            elif a_t2:
+                result = self.downsize_team(child, 4, 2)
+            else:
+                result = self.remove_extra_order(child, 4)
+        elif a_t3 < 0:
+            if a_t4 and available_pizzas:
+                result = self.upsize_team(child, 3, 4, available_pizzas)
+            elif a_t2:
+                result = self.downsize_team(child, 3, 2)
+            else:
+                result = self.remove_extra_order(child, 3)
+        else:
+            if a_t4 and len(available_pizzas) >= 2:
+                result = self.upsize_team(child, 2, 4, available_pizzas)
+            elif a_t3 and available_pizzas:
+                result = self.upsize_team(child, 2, 3, available_pizzas)
+            else:
+                result = self.remove_extra_order(child, 2)
+        return result
+
+    @staticmethod
+    def downsize_team(child: List[List[int]], target_team: int, new_team: int) -> List[List[int]]:
+        result = []
+        downsized = False
+        for order in child:
+            if not downsized and order[0] == target_team:
+                downsized = True
+                result.append([new_team] + order[1:new_team - target_team])
+            else:
+                result.append(order)
+        return result
+
+    @staticmethod
+    def upsize_team(child: List[List[int]], target_team: int, new_team: int, available_pizzas) -> List[List[int]]:
+        result = []
+        upsized = False
+        for order in child:
+            if not upsized and order[0] == target_team:
+                upsized = True
+                result.append([new_team] + order[1:] + available_pizzas[:new_team - target_team])
+            else:
+                result.append(order)
+        return result
+
+    @staticmethod
+    def remove_extra_order(child: List[List[int]], target_team: int) -> List[List[int]]:
+        result = []
+        removed = False
+        for order in child:
+            if not removed and order[0] == target_team:
+                removed = True
+            else:
+                result.append(order)
+        return result
 
     def mutate(self, child: List[List[int]]) -> List[List[int]]:
         mutate = choices([True, False], cum_weights=[self.mutation_factor, 100], k=1)[0]
@@ -90,8 +169,8 @@ class Breeder:
             used_pizzas = [pizza for order in child for pizza in order[1:]]
             available_pizzas = [pizza for pizza in self.pizzas_indexes if pizza not in used_pizzas]
             if available_pizzas:
-                order_index = randint(0, len(child)-1)
-                order_pizza_index = randint(1, len(child[order_index])-1)
+                order_index = randint(0, len(child) - 1)
+                order_pizza_index = randint(1, len(child[order_index]) - 1)
                 new_pizza = sample(available_pizzas, k=1)[0]
                 new_child[order_index][order_pizza_index] = new_pizza
             else:
@@ -101,4 +180,3 @@ class Breeder:
                 new_child[orders_indexes[0]][order_a_pizza_index], new_child[orders_indexes[1]][order_b_pizza_index] = \
                     new_child[orders_indexes[1]][order_b_pizza_index], new_child[orders_indexes[0]][order_a_pizza_index]
         return new_child
-
