@@ -43,11 +43,11 @@ class Breeder:
             duplicates = used_pizzas[:]
             for x in list(set(used_pizzas)):
                 duplicates.remove(x)
-            if duplicates:
-                result = self.correct_duplicates(available_pizzas, duplicates, result)
+            if len(result) > self.competition.total_teams:
+                result = self.remove_extra_order(result, choices([2, 3, 4], k=1)[0])
             else:
-                if len(result) > self.competition.total_teams:
-                    result = self.remove_extra_order(result, choices([2, 3, 4], k=1)[0])
+                if duplicates:
+                    result = self.correct_duplicates(available_pizzas, duplicates, result)
                 else:
                     result = self.correct_exceeded_teams(available_pizzas, result)
         return result
