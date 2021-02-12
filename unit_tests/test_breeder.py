@@ -327,7 +327,7 @@ class TestBreeder:
 
         competition_e = Competition(2, 1, 0)
         validator_e = Validator(competition_e, 9)
-        breeder_e = Breeder(list(range(9)), validator_a, competition_e, 0)
+        breeder_e = Breeder(list(range(9)), validator_e, competition_e, 0)
         solution_e = [[4, 0, 1, 2, 3], [3, 4, 5, 6], [2, 7, 8]]
         result_e = breeder_e.verify_and_correct(solution_e)
         assert validator_e.validate(result_e)

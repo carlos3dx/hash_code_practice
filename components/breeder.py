@@ -40,7 +40,7 @@ class Breeder:
         while not self.validator.validate(result):
             used_pizzas = [pizza for order in result for pizza in order[1:]]
             available_pizzas = [pizza for pizza in self.pizzas_indexes if pizza not in used_pizzas]
-            duplicates = deepcopy(used_pizzas)
+            duplicates = used_pizzas[:]
             for x in list(set(used_pizzas)):
                 duplicates.remove(x)
             if duplicates:
@@ -90,39 +90,34 @@ class Breeder:
                 new_child.append(order)
         return new_child
 
-    # TODO refactor to remove complexity
     def correct_exceeded_teams(self, available_pizzas: List[int], child: List[List[int]]) -> List[List[int]]:
         used_teams = [order[0] for order in child]
-        a_t2 = self.competition.teams_of_two - used_teams.count(2)
-        a_t3 = self.competition.teams_of_three - used_teams.count(3)
-        a_t4 = self.competition.teams_of_four - used_teams.count(4)
+        availability = {2: self.competition.teams_of_two - used_teams.count(2),
+                        3: self.competition.teams_of_three - used_teams.count(3),
+                        4: self.competition.teams_of_four - used_teams.count(4)}
+        team_to_modify = None
+        for key, value in availability.items():
+            if value < 0:
+                team_to_modify = key
+                break
 
-        if a_t3 < 0 and a_t4 < 0:
-            if a_t2:
-                result = self.downsize_team(child, 3, 2)
+        teams_available = []
+        for key, value in availability.items():
+            if value > 0:
+                teams_available.append(key)
+
+        if teams_available:
+            max_team = max(teams_available)
+            min_team = min(teams_available)
+            if team_to_modify < max_team <= len(available_pizzas):
+                result = self.upsize_team(child, team_to_modify, max_team, available_pizzas)
+            elif team_to_modify < min_team:
+                result = self.upsize_team(child, team_to_modify, min_team, available_pizzas)
             else:
-                result = self.remove_extra_order(child, 3)
-        elif a_t4 < 0:
-            if a_t3:
-                result = self.downsize_team(child, 4, 3)
-            elif a_t2:
-                result = self.downsize_team(child, 4, 2)
-            else:
-                result = self.remove_extra_order(child, 4)
-        elif a_t3 < 0:
-            if a_t4 and available_pizzas:
-                result = self.upsize_team(child, 3, 4, available_pizzas)
-            elif a_t2:
-                result = self.downsize_team(child, 3, 2)
-            else:
-                result = self.remove_extra_order(child, 3)
+                result = self.downsize_team(child, team_to_modify, max_team if max_team < team_to_modify else min_team)
         else:
-            if a_t4 and len(available_pizzas) >= 2:
-                result = self.upsize_team(child, 2, 4, available_pizzas)
-            elif a_t3 and available_pizzas:
-                result = self.upsize_team(child, 2, 3, available_pizzas)
-            else:
-                result = self.remove_extra_order(child, 2)
+            result = self.remove_extra_order(child, team_to_modify)
+
         return result
 
     @staticmethod
