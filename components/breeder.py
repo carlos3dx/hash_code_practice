@@ -106,7 +106,7 @@ class Breeder:
             if value > 0:
                 teams_available.append(key)
 
-        if team_to_modify and teams_available:
+        if teams_available:
             max_team = max(teams_available)
             min_team = min(teams_available)
             if team_to_modify < max_team <= len(available_pizzas):

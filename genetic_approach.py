@@ -71,7 +71,7 @@ if __name__ == '__main__':
 
     best_score = score_calculator.calculate(population[0])
 
-    print(f'Initial best score is {best_score} poitns')
+    print(f'Initial best score is {best_score} points')
     iterations_without_improvement = 0
 
     validator = Validator(competition, len(pizzeria.pizzas))
@@ -117,6 +117,9 @@ if __name__ == '__main__':
         # remove individuals with poor score
         if len(population) > args.max_pop:
             population = population[:args.max_pop]
+        with open(args.population, 'w') as outfile:
+            json.dump({"population": population}, outfile)
+        write_result(args.result, population[0])
     score = score_calculator.calculate(population[0])
     print(f'Best solution has a score of {score} points')
 
