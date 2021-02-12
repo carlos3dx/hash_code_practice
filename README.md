@@ -1,4 +1,5 @@
-#Hash Code 2021 practice example
+# Hash Code 2021 practice example
+
 This project is my attempt to solve the parctice round in 2021 Google's Hash Code competition (https://codingcompetitions.withgoogle.com/hashcode)
 
 The provided files are inside the `doc` folder.
