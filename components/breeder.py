@@ -44,7 +44,7 @@ class Breeder:
             for x in list(set(used_pizzas)):
                 duplicates.remove(x)
             if len(result) > self.competition.total_teams:
-                result = self.remove_extra_order(result, choices([2, 3, 4], k=1)[0])
+                result = self.remove_extra_order(result, choices([2, 3, 4], k=len(result) - self.competition.total_teams))
             else:
                 if duplicates:
                     result = self.correct_duplicates(available_pizzas, duplicates, result)
@@ -60,7 +60,8 @@ class Breeder:
             result = self.correct_duplicates_without_available_pizzas(duplicates, child)
         return result
 
-    def correct_duplicates_with_available_pizzas(self, available_pizzas: List[int], duplicates: List[int],
+    @staticmethod
+    def correct_duplicates_with_available_pizzas(available_pizzas: List[int], duplicates: List[int],
                                                  child: List[List[int]]) -> List[List[int]]:
         new_child = []
         for order in child:
@@ -77,8 +78,8 @@ class Breeder:
                 new_child.append(order)
         return new_child
 
-    def correct_duplicates_without_available_pizzas(self, duplicates: List[int], child: List[List[int]]) -> List[
-        List[int]]:
+    @staticmethod
+    def correct_duplicates_without_available_pizzas(duplicates: List[int], child: List[List[int]]) -> List[List[int]]:
         new_child = []
         for order in child:
             order_to_remove = None
@@ -106,17 +107,17 @@ class Breeder:
             if value > 0:
                 teams_available.append(key)
 
-        if team_to_modify and teams_available:
-            max_team = max(teams_available)
-            min_team = min(teams_available)
-            if team_to_modify < max_team <= len(available_pizzas):
-                result = self.upsize_team(child, team_to_modify, max_team, available_pizzas)
-            elif team_to_modify < min_team:
-                result = self.upsize_team(child, team_to_modify, min_team, available_pizzas)
-            else:
-                result = self.downsize_team(child, team_to_modify, max_team if max_team < team_to_modify else min_team)
+        # if teams_available:
+        max_team = max(teams_available)
+        min_team = min(teams_available)
+        if team_to_modify < max_team <= len(available_pizzas):
+            result = self.upsize_team(child, team_to_modify, max_team, available_pizzas)
+        elif team_to_modify < min_team:
+            result = self.upsize_team(child, team_to_modify, min_team, available_pizzas)
         else:
-            result = self.remove_extra_order(child, team_to_modify)
+            result = self.downsize_team(child, team_to_modify, max_team if max_team < team_to_modify else min_team)
+        # else:
+        #     result = self.remove_extra_order(child, [team_to_modify])
 
         return result
 
@@ -145,12 +146,11 @@ class Breeder:
         return result
 
     @staticmethod
-    def remove_extra_order(child: List[List[int]], target_team: int) -> List[List[int]]:
+    def remove_extra_order(child: List[List[int]], target_teams: List[int]) -> List[List[int]]:
         result = []
-        removed = False
         for order in child:
-            if not removed and order[0] == target_team:
-                removed = True
+            if order[0] in target_teams:
+                target_teams.remove(order[0])
             else:
                 result.append(order)
         return result

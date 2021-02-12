@@ -1,10 +1,12 @@
 import argparse
 import copy
 import json
+import multiprocessing
 import sys
 from random import shuffle
+from typing import List, Tuple
 
-from math import floor
+from math import floor, ceil
 
 from components.breeder import Breeder
 from components.data_import import read_file
@@ -35,6 +37,15 @@ parser.add_argument('-r', '--result', metavar='OUTPUT_FILE', type=str, help='Out
 parser.add_argument('-p', '--population', metavar='POPULATION_OUTPUT_FILE', type=str,
                     help='Output file with the population', default='population.json')
 
+
+def process(process_breeder: Breeder, parent_a: List[List[int]], parent_b: List[List[int]]) \
+        -> List[List[List[int]]]:
+    new_population = process_breeder.breed(parent_a, parent_b)
+    new_population.append(parent_a)
+    new_population.append(parent_b)
+    return new_population
+
+
 if __name__ == '__main__':
     args = parser.parse_args()
     if not args.file:
@@ -51,6 +62,8 @@ if __name__ == '__main__':
         print('Generating random population')
         population = generate_pop(args.initial_pop, competition, pizzeria)
 
+    num_cores = multiprocessing.cpu_count()
+
     score_calculator = ScoreCalculator(pizzeria.pizzas)
     print('Calculate initial score')
 
@@ -58,11 +71,13 @@ if __name__ == '__main__':
 
     best_score = score_calculator.calculate(population[0])
 
-    print(f'Initial best score is {best_score} poitns')
+    print(f'Initial best score is {best_score} points')
     iterations_without_improvement = 0
 
     validator = Validator(competition, len(pizzeria.pizzas))
     breeder = Breeder(list(pizzeria.pizzas.keys()), validator, competition, args.evolution)
+
+    pool = multiprocessing.Pool(processes=num_cores)
 
     print('-' * 30)
     for i in range(args.max_iterations):
@@ -71,15 +86,17 @@ if __name__ == '__main__':
         shuffle(population)
         new_pop = []
         num_pairs = floor(len(population) / 2)
+        pairs = []
+
         for i in range(num_pairs):
             parent_a = population[i * 2]
             parent_b = population[1 + i * 2]
-            new_pop.append(parent_a)
-            new_pop.append(parent_b)
-            children = breeder.breed(parent_a, parent_b)
-            new_pop.extend(children)
+            pairs.append((breeder, parent_a, parent_b))
+
+        results = pool.starmap(process, pairs)
+        new_pop = [pop for result in results for pop in result]
         if len(population) % 2:
-            new_pop.extend(population[num_pairs*2:])
+            new_pop.extend(population[num_pairs * 2:])
         population = copy.deepcopy(new_pop)
         # breed
         # calcule score and order according
@@ -100,6 +117,9 @@ if __name__ == '__main__':
         # remove individuals with poor score
         if len(population) > args.max_pop:
             population = population[:args.max_pop]
+        with open(args.population, 'w') as outfile:
+            json.dump({"population": population}, outfile)
+        write_result(args.result, population[0])
     score = score_calculator.calculate(population[0])
     print(f'Best solution has a score of {score} points')
 
