@@ -97,9 +97,7 @@ class Breeder:
         a_t3 = self.competition.teams_of_three - used_teams.count(3)
         a_t4 = self.competition.teams_of_four - used_teams.count(4)
 
-        if a_t2 < 0 and a_t3 < 0 and a_t4 < 0:
-            result = self.remove_extra_order(child, 2)
-        elif a_t3 < 0 and a_t4 < 0:
+        if a_t3 < 0 and a_t4 < 0:
             if a_t2:
                 result = self.downsize_team(child, 3, 2)
             else:

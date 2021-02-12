@@ -299,3 +299,42 @@ class TestBreeder:
         result = breeder.mutate(input_result)
 
         assert result in possible_valid_outcomes
+
+    def test_verify_and_correct_issues_with_teams(self):
+        competition_a = Competition(1, 1, 0)
+        validator_a = Validator(competition_a, 9)
+        breeder_a = Breeder(list(range(9)), validator_a, competition_a, 0)
+        solution_a = [[4, 0, 1, 2, 3], [3, 4, 5, 6], [2, 7, 8]]
+        result_a = breeder_a.verify_and_correct(solution_a)
+        assert validator_a.validate(result_a)
+
+        solution_b = [[3, 0, 1, 2], [3, 4, 5, 6], [2, 7, 8]]
+        result_b = breeder_a.verify_and_correct(solution_b)
+        assert validator_a.validate(result_b)
+
+        validator_c = Validator(competition_a, 14)
+        breeder_c = Breeder(list(range(14)), validator_c, competition_a, 0)
+        solution_c = [[4, 0, 1, 2, 3], [3, 4, 5, 6], [2, 7, 8], [3, 9, 10, 11], [2, 12, 13]]
+        result_c = breeder_c.verify_and_correct(solution_c)
+        assert validator_c.validate(result_c)
+
+        competition_d = Competition(2, 3, 0)
+        validator_d = Validator(competition_d, 14)
+        breeder_d = Breeder(list(range(14)), validator_d, competition_d, 0)
+        solution_d = [[4, 0, 1, 2, 3], [3, 4, 5, 6], [2, 7, 8], [3, 9, 10, 11], [2, 12, 13]]
+        result_d = breeder_d.verify_and_correct(solution_d)
+        assert validator_d.validate(result_d)
+
+        competition_e = Competition(2, 1, 0)
+        validator_e = Validator(competition_e, 9)
+        breeder_e = Breeder(list(range(9)), validator_a, competition_e, 0)
+        solution_e = [[4, 0, 1, 2, 3], [3, 4, 5, 6], [2, 7, 8]]
+        result_e = breeder_e.verify_and_correct(solution_e)
+        assert validator_e.validate(result_e)
+
+        competition_f = Competition(10, 0, 0)
+        validator_f = Validator(competition_d, 7)
+        breeder_f = Breeder(list(range(7)), validator_f, competition_f, 0)
+        solution_f = [[4, 0, 1, 2, 3], [3, 4, 5, 6]]
+        result_f = breeder_f.verify_and_correct(solution_f)
+        assert validator_f.validate(result_f)
