@@ -1,11 +1,16 @@
-#Hash Code 2021 practice example
+# Hash Code 2021 practice example
+
 This project is my attempt to solve the parctice round in 2021 Google's Hash Code competition (https://codingcompetitions.withgoogle.com/hashcode)
 
-The provided files are inside the `doc` folder.
+The provided files including the PDF with the problem definition) are inside the `doc` folder.
+
+There are some different approaches to solve the problem.
+
+Python 3.9 is required
+
+## Genetic approach
 
 In this attempt I've tried to use an implementation of a genetic algorithm to solve each one of the proposed problems.
-
-This program requires Python 3.9
 
 The genetic algorithm approach can be executed with `python genetic_approach.py`
 
@@ -32,4 +37,35 @@ The genetic algorithm approach can be executed with `python genetic_approach.py`
 
 ```
 
-Because the harder the problem, the longer it takes to compute, in each iteration of the algorithm the current best solution and population is saved.
+Because the harder the problem, the longer it takes to compute, in each iteration of the algorithm the current best 
+solution and population is saved.
+
+The main problem is when generating new population from the previous one, the result's genome has some problems that 
+have to been fixed in order to constitute a valid solution. The longer the solution, the harder it is to correct.
+
+Maybe another approach to encoding the solution that makes the combination mistakes asier to fix would be better but 
+I cannot imagine one right now.
+
+## Random approach
+
+As its name suggests, this approach use the function to create a random solution (used in the genetic approach for the 
+initial population) and if the score of the new solution beats the current best score (or the provided initial one) it 
+saves the output.
+
+The random approach can be executed with `python random_approach.py`
+
+```
+  -h, --help            show this help message and exit
+  -i INPUT_FILE, --file INPUT_FILE
+                        The file provided with the challenge as an input
+  -r OUTPUT_FILE, --result OUTPUT_FILE
+                        Output file with the best result
+  -m MAX_LOOPS, --max_loops MAX_LOOPS
+                        Number of iterations the program is running
+  -s SCORE, --score SCORE
+                        The initial score to beat, from previous executions
+
+```
+
+The problem with this approach is easy to visualise, the higher the score to beat, the harder is to get a better 
+solution through random solution generation.

@@ -25,7 +25,7 @@ def generate_pop(num: int, competition: Competition, pizzeria: Pizzeria) -> List
             orders.append(order)
 
         # TODO refactor
-        if remaining_people >= 2 and len(pizza_indexes) >= 2 :
+        if remaining_people >= 2 and len(pizza_indexes) >= 2:
             if remaining_people == len(pizza_indexes):
                 orders.append([remaining_people] + pizza_indexes)
             elif len(pizza_indexes) > remaining_people:
