@@ -32,3 +32,22 @@ class TestObjects:
         c1 = Competition(5, 4, 3)
         c2 = 'mock'
         assert c1 != c2
+
+    def test_pizzeria_reverse_index_properly_constructed(self):
+        pizzas = {0: [0, 1, 2],
+                  1: [3, 4, 5],
+                  2: [6, 3, 1],
+                  3: [4, 3, 5],
+                  4: [6, 5]}
+        expected_reverse_index = {
+            0: [0],
+            1: [0, 2],
+            2: [0],
+            3: [1, 2, 3],
+            4: [1, 3],
+            5: [1, 3, 4],
+            6: [2, 4]
+        }
+        pizzeria = Pizzeria(pizzas, 7)
+
+        assert pizzeria.ingredients_reverse_index == expected_reverse_index
