@@ -26,17 +26,19 @@ parser.add_argument('-u', '--second_team', type=int, help='The number of the tea
 
 class PizzaScore:
     def __init__(self, used_ingredients: List[int]) -> None:
-        self.used_ingredients = used_ingredients
+        self.used_ingredients = set(used_ingredients)
 
     def compare(self, pizza: Tuple[int, List[int]]) -> int:
-        return len([ingredient for ingredient in pizza[1] if ingredient not in self.used_ingredients])
+        return len(set(pizza[1]) - self.used_ingredients)
 
 
 def create_order(team_type: int, available_pizzas: dict, pizz: Pizzeria, lock: Lock) -> [List[int]]:
     order = [team_type]
     for x in range(team_type):
         if x:
-            used_ingredients = [ingredient for pizza in order[1:] for ingredient in pizz.pizzas.get(pizza)]
+            used_ingredients = []
+            for pizza in order[1:]:
+                used_ingredients.extend(pizz.pizzas.get(pizza))
             # print(used_ingredients)
             pizza_score = PizzaScore(used_ingredients)
             possible_pizzas = list(available_pizzas.items())
@@ -100,7 +102,7 @@ if __name__ == '__main__':
             remaining_num_of_team = available_teams.get(team)
             remaining_num_of_team -= 1
             available_teams[team] = remaining_num_of_team
-
+    print(f'expected a total of {len(orders_to_fill)} orders')
     num_cores = multiprocessing.cpu_count()
     pool = multiprocessing.Pool(processes=num_cores)
     solution = pool.starmap(create_order, orders_to_fill)
