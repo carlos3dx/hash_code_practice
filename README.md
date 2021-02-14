@@ -69,3 +69,26 @@ The random approach can be executed with `python random_approach.py`
 
 The problem with this approach is easy to visualise, the higher the score to beat, the harder is to get a better 
 solution through random solution generation.
+
+## Generator approach
+
+This one tries to create orders with the mos valuable pizza for each order, starting to creat orders for the type 
+team specified (by default teams of four members).
+
+The generator approach can be executed with `python generator_approach.py`
+
+```
+  -h, --help            show this help message and exit
+  -i INPUT_FILE, --file INPUT_FILE
+                        The file provided with the challenge as an input
+  -r OUTPUT_FILE, --result OUTPUT_FILE
+                        Output file with the best result
+  -t TEAM, --team TEAM  The number of the team which will try to complete orders first
+  -u SECOND_TEAM, --second_team SECOND_TEAM
+                        The number of the team which will try to complete orders in second place. If not specified it would be chosen randomly
+
+```
+
+In an attempt to make it more efficient with `multiprocessing` I think I just made it worse and all processes are 
+locking each other and invalidating the possible outcome, cause it looks like it never stops on any problem 
+except A and B.
